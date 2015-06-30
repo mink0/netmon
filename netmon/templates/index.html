@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% load render_table from django_tables2 %}
+
+{% block header %}
+  <div class="top-jumbo round col_12">
+    <h1>NETMON 414</h1>
+  </div>
+{% endblock %}
+
+{% block content %}
+  {% if error %}
+    <div class="notice error">
+      {{ error|safe }}
+    </div>
+  {% endif %}
+
+  {% if errors %}
+    <div class="notice error">
+      <ul>
+        {% for error in errors %}
+          <li>{{ error|safe }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+
+  {% if warnings %}
+    <div class="notice warning">
+      <ul>
+        {% for warning in warnings %}
+          <li>{{ warning|safe }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+
+  <ul class="tabs left">
+    <li class="tooltip" title="Сетевые устройства, с которых собирается сетевая статистика">
+      <a href="#tab-active"><i class="icon-circle tab-icn"></i>Активные ({{ dev_count }})</a></li>
+    <li class="tooltip" title="Сетевые устройства, с которых статистика не собирается">
+      <a href="#tab-passive"><i class="icon-circle-blank tab-icn"></i>Пассивные ({{ dev_eol_count }})</a></li>
+  </ul>
+
+  <div id="tab-active" class="tab-content">
+    {% render_table dev_table %}
+  </div>
+
+  <div id="tab-passive" class="tab-content">
+    {% render_table dev_eol_table %}
+  </div>
+{% endblock %}
+

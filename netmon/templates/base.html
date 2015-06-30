@@ -1,0 +1,80 @@
+{% load is_current_page %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <!-- Standard Meta -->
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Site Properities -->
+  <title>{% block title %}netmon{% endblock %}</title>
+  <link rel="stylesheet" href="{{ STATIC_URL }}html-kickstart/css/kickstart.css" type="text/css">
+  <link rel="stylesheet" href="{{ STATIC_URL }}bower_components/datetimepicker/jquery.datetimepicker.css" type="text/css">
+  <link rel="stylesheet" href="{{ STATIC_URL }}bower_components/toastr/toastr.css" type="text/css">
+  <link rel="stylesheet" href="{{ STATIC_URL }}styles.css" type="text/css">
+</head>
+
+<body>
+  <div class="container">
+    <div class="grid">
+      <div class="top-navbar col_12">
+        <ul class="menu pull-left">
+          {% url 'index' as index_url %}
+          {% url 'tools' as tools_url %}
+          {% url 'ifrate' as ifrate_url %}
+          {% url 'admin:index' as admin_url %}
+          <li {% if index_url|is_current_page:request %} class="current" {% endif %}><a href="{{ index_url }}">Главная</a></li>
+{#          <li class="item">{% block sidebar-device %}<a href="{% url 'device' %}">Устройства</a>{% endblock %}</li>#}
+{#          <li class="item">{% block sidebar-interface %}<a href="{% url 'interface' %}">Интерфейсы</a>{% endblock %}</li>#}
+          <li {% if ifrate_url|is_current_page:request %} class="current" {% endif %}><a href="{{ ifrate_url }}">Риалтайм</a></li>
+          <li {% if tools_url|is_current_page:request %} class="current" {% endif %}><a href="{{ tools_url }}">Инструменты</a></li>
+          <li {% if admin_url|is_current_page:request %} class="current" {% endif %}><a href="{{ admin_url }}">Настройки</a></li>
+        </ul>
+        <div class="pull-right">
+          <form class="reset" id="head-search" method="get" action="/search/">
+            <input type="text" name="search" placeholder="Найти" {% block searchbar %}value=""{% endblock %}>
+          </form>
+        </div>
+      </div>
+
+      {% block breadcrumbs-bar %}
+      {% endblock %}
+
+      {% block header %}
+      {% endblock %}
+
+      <div class="col_12 col-gray">
+        <div class="col_12">
+        {% block content %}
+          {{ content }}
+        {% endblock %}
+        </div>
+      </div>
+
+      <div id="footer" class="row">
+        {% block footer %}
+        <p>Для работы рекомендуется использовать браузеры Mozilla Firefox и Google Chrome последних версий</p>
+        <p>:: COPYRIGHT РКК "Энергия" &copy; 2011 :::: 414  d(^_^)b zZzz</p>
+        {% endblock %}
+      </div>
+    </div>
+  </div>
+
+  <script type="text/javascript" src="{{ STATIC_URL }}bower_components/jquery/jquery.min.js"></script>
+  <script type="text/javascript" src="{{ STATIC_URL }}html-kickstart/js/kickstart.min.js"></script>
+  <script type="text/javascript" src="{{ STATIC_URL }}lib/scrollToTop.js"></script>
+
+  {% block javascript %}
+{#    <script type="text/javascript">#}
+{#      $(function() {#}
+{#        // add fancy flash animation for tablesorter plugin#}
+{#        $("th").click(function () {#}
+{#          $(this).effect("highlight", {color: "#646464"}, 200);#}
+{#        });#}
+{#      });#}
+{#    </script>#}
+  {% endblock %}
+
+</body>
+</html>

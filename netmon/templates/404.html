@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block header %}
+  <div class="col_12">
+    <div class="top-error-wrap">
+      <div class="top-error">
+        {#<h1 class="center title">ОШИБКА 404</h1>#}
+        <h5 class="title"> Страница, которую Вы ищете, не найдена на сервере</h5>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block content %}
+  <pre>{{ request_path }}</pre>
+{% endblock %}

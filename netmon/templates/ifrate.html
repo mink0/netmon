@@ -1,0 +1,178 @@
+{% extends "base.html" %}
+
+{% block breadcrumbs %}
+  {{ block.super }}
+  <li><a href="{% url 'device' %}{{ interface.dev_id_id }}">{{ interface.dev_id }}</a></li>
+  <li><a href=".">{{ interface.if_description }}</a></li>
+{% endblock %}
+
+{% block content %}
+  <div class="top-panel">
+    <h5 class="center title">Мониторинг загрузки сетевых интерфейсов в реальном времени</h5>
+  </div>
+  {% if error %}
+    <div class="notice error">
+      <i class="icon-remove-sign icon-large"></i>
+      {{ error|safe }}
+    </div>
+  {% endif %}
+
+  {% if errors %}
+    <div class="notice error">
+      <ul>
+        {% for error in errors %}
+          <li>{{ error|safe }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+
+  {% if warnings %}
+    <div class="notify">
+      {% for warning in warnings %}
+        <div class="notice warning">
+          <i class="icon-warning-sign icon-large"></i>
+          {{ warning|safe }}
+          <a href="#close" class="icon-remove"></a></div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  {% if ifdata and not error and not errors %}
+    <div id="ajax-error" class="notice warning">
+      <i class="icon-eye-open icon-large"></i>
+      <p>Загрузка данных...</p></div>
+  {% endif %}
+  <br/>
+
+  <form id="form-dt" action="" method="get" style="text-align: center;">
+    <p>
+      {{ form_host_query.host.label }}: {{ form_host_query.host }}
+
+      {{ form_host_query.community.label }}: {{ form_host_query.community }}
+
+      {{ form_host_query.snmpver.label }}: {{ form_host_query.snmpver }}
+      <input id="form-dt-submit" type="submit" class="green" value="Запрос">
+    </p>
+    {% if form_host_query.interface %}
+      <fieldset>
+        <legend>Интерфейсы</legend>
+        {{ form_host_query.interface }}
+      </fieldset>
+    {% endif %}
+  </form>
+
+  {% if ifdata and not error and not errors %}
+    <div id="save-to-file">
+      <div id="if-caption" class="col_12 center">
+        <h4>
+          {{ ifdata.if_descr }}: {{ ifdata.if_alias }} ({{ ifdata.ifmaxspeed }})
+          <button id="if-clear-zoom" data-fname="clear-zoom" class="pill tooltip pull-right hide"
+                  title="Сбросить зум"><i class="icon-zoom-out"></i></button>
+        </h4>
+      </div>
+
+{#      <div id="if-header" class="col_12">#}
+{#        <span class="right">#}
+{#          Ошибки#}
+{#          вход: <span id="if-in-err"></span>#}
+{#          исх: <span id="if-out-err"></span>#}
+{#        </span>#}
+{#      </div>#}
+
+      <div id="if-canvas" class="col_12"></div>
+
+      <hr class="alt2">
+      <div class="col_12">
+        <ul class="if-controls pull-left button-bar">
+          <li><a data-fname="hist" class="tooltip" title="Гистограмма" href="#"><i class="icon-bar-chart"></i>
+            Гист-ма</a>
+          </li>
+          <li><a data-fname="lines" class="tooltip" title="Линии" href="#"><i class="icon-exchange"></i> Линии</a>
+          </li>
+          <li><a data-fname="points" class="tooltip" title="Точки сбора данных" href="#">
+            <i class="icon-screenshot"></i> Точки</a></li>
+        </ul>
+        <ul class="if-controls pull-right button-bar">
+          <li><a data-fname="make-table" class="tooltip" title="Таблица с текущими данными" href="#"><i
+              class="icon-table"></i> Таблица</a></li>
+          <li><a data-fname="full-width" class="tooltip" title="На всю ширину экрана" href="#"><i
+              class="icon-resize-horizontal"></i> Ширше</a></li>
+          <li>
+            <select id="update-interval">
+              <option value="5">5с.</option>
+              <option value="10">10с.</option>
+              <option value="30">30с.</option>
+              <option value="60">1м.</option>
+              <option value="600">10м.</option>
+            </select>
+          </li>
+          <li><a data-fname="save" class="tooltip" title="Сохранить в файл (экспериментальная поддержка)" href="#">
+            <i class="icon-save"></i></a>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div id="if-table" class="col_12"></div>
+  {% endif %}
+{% endblock %}
+
+{% block javascript %}
+  <!--[if lte IE 8]><script language="javascript" type="text/javascript" src="{{ STATIC_URL }}bower_components/flot/excanvas.min.js"></script><![endif]-->
+  <script type="text/javascript" src="{{ STATIC_URL }}bower_components/flot/jquery.flot.min.js"></script>
+  <script type="text/javascript" src="{{ STATIC_URL }}bower_components/flot/jquery.flot.time.min.js"></script>
+
+  <script type="text/javascript" src="{{ STATIC_URL }}bower_components/toastr/toastr.min.js"></script>
+
+  <script type="text/javascript" src="{{ STATIC_URL }}bower_components/html2canvas/build/html2canvas.min.js"></script>
+  <script type="text/javascript" src="{{ STATIC_URL }}bower_components/blueimp-canvas-to-blob/js/canvas-to-blob.min.js"></script>
+  {# нужно для поддержки старых броузеров в file-saver #}
+  <script type="text/javascript" src="{{ STATIC_URL }}bower_components/file-saver/file-saver.min.js"></script>
+
+  {# FIXME: хак для загрузки формы по клику на кнопочку #}
+  <script type="text/javascript">
+    $(document).ready(function () {
+      $('#form-dt li').click(function (e) {
+
+        $(this).find('input').prop("checked", true);
+        $('#form-dt-submit').click();
+      });
+    });
+  </script>
+
+  {#  load data from Django for ifrate.js#}
+  {% if ifdata and not error and not errors %}
+    <script type="text/javascript">
+      var djHost = '{{ ifdata.host }}';
+      var djCommunity = '{{ ifdata.community }}';
+      var djSnmpVer = '{{ ifdata.snmpver }}';
+      var djIf = '{{ ifdata.if_id }}';
+      var djAjaxUrl = '{{ ifdata.ajax_url }}';
+      var djIfName = '{{ ifdata.if_name }}';
+      var djSysName = '{{ ifdata.sysname }}';
+    </script>
+  {% endif %}
+
+  {% if ifdata and not error and not errors %}
+    <script type="text/javascript" src="{{ STATIC_URL }}ifrate.js"></script>
+  {% endif %}
+{% endblock %}
+
+{% comment %}
+{% block footer %}
+  <div class="users clearfix">
+    <p class="pull-left">Пользователи:
+    <ul>
+      {% for ip, val in ip_list.items %}
+        <li>{{ ip }}:
+          {% for host in val %}
+            {{ host }},
+          {% endfor %}
+        </li>
+      {% endfor %}
+    </ul>
+    </p>
+  </div>
+  {{ block.super }}
+{% endblock %}
+{% endcomment %}

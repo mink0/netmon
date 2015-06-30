@@ -1,0 +1,8 @@
+*.pyc
+.*swp
+*.gif
+*.png
+*.jpg
+*.gif
+static/
+.idea/

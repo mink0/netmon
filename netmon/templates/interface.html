@@ -1,0 +1,142 @@
+{% extends "device_main.html" %}
+{% block breadcrumbs %}
+  {{ block.super }}
+  <li><a href="{% url 'device' %}{{ interface.dev_id_id }}">{{ interface.dev_id }}</a></li>
+  <li><a href=".">{{ interface.if_description }}</a></li>
+{% endblock %}
+
+{% block content %}
+  {% if error %}
+    <div class="notice error">
+      <i class="icon-remove-sign icon-large"></i>
+      {{ error|safe }}
+    </div>
+  {% endif %}
+
+  {% if errors %}
+    <div class="notice error">
+      <ul>
+        {% for error in errors %}
+          <li>{{ error|safe }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+
+  {% if warnings %}
+    <div class="notify">
+      {% for warning in warnings %}
+        <div class="notice warning">
+          <i class="icon-warning-sign icon-large"></i>
+          {{ warning|safe }}
+          <a href="#close" class="icon-remove"></a></div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <br/>
+
+  {% if form_dt %}
+  <form id="form-dt" action="" method="get">
+    {{ form_dt.time_begin.label }}: {{ form_dt.time_begin }}
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    {{ form_dt.time_end.label }}: {{ form_dt.time_end }}
+    <input type="submit" class="green" value="Запрос" style="margin-left: 5px;">
+  </form>
+  {% endif %}
+
+  {% if not error and not errors %}
+    <div id="save-to-file">
+      <div id="if-caption" class="col_12 center">
+        <h4>
+          {% if interface.if_notes %}
+            {{ interface.if_description }}: {{ interface.if_notes }}
+          {% else %}
+            {{ interface.if_description }}: {{ interface.if_alias }}
+          {% endif %}
+          <button id="if-clear-zoom" data-fname="clear-zoom" class="pill tooltip pull-right hide"
+                  title="Сбросить зум"><i class="icon-zoom-out"></i></button>
+        </h4>
+      </div>
+
+      <div id="if-canvas" class="col_12">
+
+      </div>
+
+      <hr class="alt2">
+      <div class="col_12">
+        <ul class="if-controls pull-left button-bar">
+          <li><a data-fname="hist" class="tooltip" title="Гистограмма" href="#"><i class="icon-bar-chart"></i>
+            Гист-ма</a>
+          </li>
+          <li><a data-fname="lines" class="tooltip" title="Линии" href="#"><i class="icon-exchange"></i> Линии</a>
+          </li>
+          <li><a data-fname="points" class="tooltip" title="Точки сбора данных" href="#"><i
+              class="icon-screenshot"></i> Точки</a></li>
+        </ul>
+        <ul class="if-controls pull-right button-bar">
+          <li><a data-fname="make-table" class="tooltip" title="Таблица с текущими данными" href="#"><i
+              class="icon-table"></i> Таблица</a></li>
+          <li><a data-fname="full-width" class="tooltip" title="На всю ширину экрана" href="#"><i
+              class="icon-resize-horizontal"></i> Ширше</a></li>
+          <li><a data-fname="save" class="tooltip" title="Сохранить в файл (экспериментальная поддержка)" href="#"><i
+              class="icon-save"></i></a></li>
+        </ul>
+      </div>
+    </div>
+    <div id="if-table" class="col_12"></div>
+  {% endif %}
+{% endblock %}
+
+{% block javascript %}
+  <!--[if lte IE 8]><script language="javascript" type="text/javascript" src="{{ STATIC_URL }}bower_components/flot/excanvas.min.js"></script><![endif]-->
+  <script type="text/javascript" src="{{ STATIC_URL }}bower_components/flot/jquery.flot.min.js"></script>
+  <script type="text/javascript" src="{{ STATIC_URL }}bower_components/flot/jquery.flot.selection.min.js"></script>
+  <script type="text/javascript" src="{{ STATIC_URL }}bower_components/flot/jquery.flot.time.min.js"></script>
+  <script type="text/javascript" src="{{ STATIC_URL }}bower_components/html2canvas/build/html2canvas.min.js"></script>
+  <script type="text/javascript" src="{{ STATIC_URL }}bower_components/blueimp-canvas-to-blob/js/canvas-to-blob.min.js"></script>
+  {# нужно для поддержки старых броузеров в file-saver #}
+  <script type="text/javascript" src="{{ STATIC_URL }}bower_components/file-saver/file-saver.min.js"></script>
+  <script type="text/javascript"
+          src="{{ STATIC_URL }}bower_components/datetimepicker/jquery.datetimepicker.js"></script>
+
+  {# load data from Django for interface.js #}
+  <script type="text/javascript">
+    {% if not error and not errors %}
+      var dataDjango = {{ jscript_data|safe }};
+    {% endif %}
+    $(document).ready(function () {
+      $('input#id_time_begin, input#id_time_end').datetimepicker({
+        format: 'd.m.Y H:i:s',
+        lang: 'ru',
+        yearStart: '2011',
+{#        validateOnBlur: false#}
+      });
+    });
+{#      $('input#id_time_begin').datetimepicker({#}
+{#        format: 'd.m.Y H:i',#}
+{#        lang: 'ru',#}
+{#        validateOnBlur: false,#}
+{#       onShow:function( ct ){#}
+{#        this.setOptions({#}
+{#         maxDate:$('input#id_time_end').val()?$('input#id_time_end').val():false#}
+{#        })#}
+{#       },#}
+{#      });#}
+{##}
+{#      $('input#id_time_end').datetimepicker({#}
+{#        format: 'd.m.Y H:i',#}
+{#        lang: 'ru',#}
+{#        validateOnBlur: false,#}
+{#       onShow:function( ct ){#}
+{#        this.setOptions({#}
+{#         minDate:$('input#id_time_begin').val()?$('input#id_time_begin').val():false#}
+{#        })#}
+{#       },#}
+{#      });#}
+  </script>
+
+  {% if not error and not errors %}
+    <script type="text/javascript" src="{{ STATIC_URL }}interface.js"></script>
+  {% endif %}
+{% endblock %}

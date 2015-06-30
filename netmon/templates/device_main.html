@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block breadcrumbs-bar %}
+  <div class="top-breadcrumbs col_12">
+    <ul class="breadcrumbs">
+      {% block breadcrumbs %}
+        {{ block.super }}
+        <li><a>&nbsp;</a></li>
+        <li><a href="{% url 'device' %}">устройства</a></li>
+      {% endblock %}
+    </ul>
+  </div>
+{% endblock %}
+
+{% block content %}
+
+  {% if errors %}
+    <div class="notice error">
+      <ul>
+        {% for error in errors %}
+          <li>{{ error|safe }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+
+  <h4>Доступные сетевые устройства:</h4>
+  <table class="widefat">
+    {{ dev_full_html|safe }}
+  </table>
+
+{% endblock %}

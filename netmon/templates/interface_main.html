@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block sidebar-interface %}<a id="subcurrent" href="{% url 'interface' %}">Интерфейсы</a>{% endblock %}
+{% block breadcrumbs %}
+{{ block.super }}
+<li><a href="/">главная</a>&nbsp;›</li>
+<li><a href="{% url 'interface' %}">интерфейсы</a></li>
+{% endblock %}
+
+{% block content %}
+
+{% if errors %}
+<div class="notice error">
+  <ul>
+      {% for error in errors %}
+        <li>{{ error }}</li>
+      {% endfor %}
+  </ul>
+</div>
+{% endif %}
+
+<h4> Таблица интерфейсов: </h4>
+
+{% load render_table from django_tables2 %}
+{% render_table ttable %}
+
+<table class="widefat">
+{{ if_full_html|safe }}
+</table>
+
+{% endblock %}

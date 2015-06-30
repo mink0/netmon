@@ -1,0 +1,89 @@
+{% extends "tools_main.html" %}
+{% block javascript %}
+  {{ block.super }}
+  <script type="text/javascript">
+    $(document).ready(function () {
+      $('.animate').fadeIn('slow');
+    })
+  </script>
+
+{% endblock %}
+
+{% block content %}
+  <div class="top-panel">
+    <h5 class="center title">Информация о сетевом устройстве</h5>
+  </div>
+  {% if error %}
+    <div class="notice error">
+      {{ error|safe }}
+    </div>
+  {% endif %}
+
+  {% if error_pre %}
+    <div class="notice error">
+      <pre>{{ error_pre|safe }}</pre>
+    </div>
+  {% endif %}
+
+  {% if errors %}
+    <div class="notice error">
+      <ul>
+        {% for error in errors %}
+          <li>{{ error|safe }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+
+  {% if warnings %}
+    <div class="notice warning">
+      <ul>
+        {% for warning in warnings %}
+          <li>{{ warning|safe }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+
+  {% if not result_table %}
+    <br/>
+    <form method="get" class="full-high">
+      <table>
+        {{ form_host_query.as_table }}
+        <tr>
+          <td></td>
+          <td><input type="submit" class="green col_12" value="Отправить"></td>
+        </tr>
+      </table>
+      {#      <button type="submit" class="green col_2 pull-right"><i class="icon-chevron-right"></i></button>#}
+{#      <div class="col_5"></div>#}
+
+    </form>
+  {% endif %}
+
+  <div class="col_12">
+    {% if result_table and not error and not errors %}
+      <div class="animate hide">
+        <br>
+        <h5 class="center">{{ device.sysname }}</h5>
+        <pre>{{ device.sysdescr }}</pre>
+        <br>
+        <h5 class="center">Таблица MAC-адресов на активных портах</h5>
+        <table class="tight sortable">
+          {{ result_table|safe }}
+        </table>
+        <h5 class="center">Неактивные порты</h5>
+        <table class="tight sortable">
+          {{ result_down_table|safe }}
+        </table>
+        {% if result_cdp_table %}
+          <h5 class="center">Соседние устройства</h5>
+          <table class="tight sortable">
+            {{ result_cdp_table|safe }}
+          </table>
+        {% endif %}
+      </div>
+    {% endif %}
+  </div>
+
+{% endblock %}

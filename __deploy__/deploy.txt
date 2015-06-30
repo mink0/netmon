@@ -1,0 +1,32 @@
+Сейчас все деплоится вручную
+Есть ссылка в /srv из /home/netmon
+Весь статик в деплое расположен в /netmon/netmon/static. Править там или делать: workon netmon && ./manage.py collectstatic
+
+DEBUG = False в settings.py
+Edit ALLOWED_HOSTS
+Edit DB to production
+
+1. cd ~ && scp -r mma:~/django/netmon .
+
+2. workon netmon && pip install -r requirements.txt
+3. Apache site
+  virtualhost with right config see in __deploy__
+
+4. comment:
+    #STATICFILES_DIRS
+5. add STATIC_ROOT:
+    STATIC_ROOT = os.path.join(os.path.dirname(__file__), 'static') # /netmon/netmon/static dir. its ok for small site.
+    STATIC_URL = '/static/'
+6. workon netmon && ./manage.py collectstatic
+
+
+Migrate:
+CREATE TABLE ip_access_list (
+    ip inet PRIMARY KEY,
+    description varchar(256),
+    last_login  timestamptz
+);
+python manage.py migrate --fake-initial YES
+
+
+

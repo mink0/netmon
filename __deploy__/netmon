@@ -1,0 +1,39 @@
+# python virtualenv path:
+WSGIPythonPath /srv/netmon:/home/minko/.virtualenvs/netmon/lib/python2.7/site-packages  
+
+<VirtualHost netmon:80>
+  ServerAdmin asv@ce.ru
+  ServerName netm.c.ru
+  SetEnv DJANGO_SETTINGS_MODULE /srv/netmon/netmon.settings
+  
+  # включаем python_wsgi:
+  WSGIScriptAlias / /srv/netmon/netmon/wsgi.py
+  
+  documentroot /srv/netmon
+  <directory />
+    options followsymlinks
+    allowoverride none
+  </directory>
+  <directory /srv/netmon/>
+    options followsymlinks multiviews
+    allowoverride none
+    order deny,allow
+    allow from all
+  </directory>
+  
+  # serving static files (css, js, etc..)
+  # не рекомендуется, но заставим apache обслуживать эти файлы, отсальное обрабатывает wsgi
+  alias /robots.txt /srv/netmon/robots.txt
+  alias /favicon.ico /srv/netmon/favicon.ico
+
+  aliasmatch ^/([^/]*\.css) /srv/netmon/netmon/static/$1
+  alias /static/ /srv/netmon/netmon/static/
+
+  ErrorLog ${APACHE_LOG_DIR}/netstat-error.log
+  # possible values include: debug, info, notice, warn, error, crit,
+  # alert, emerg.
+  loglevel warn
+  
+  CustomLog ${APACHE_LOG_DIR}/netstat-access.log combined
+
+</VirtualHost>
