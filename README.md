@@ -2,12 +2,12 @@ This tool was created to provide network infrastructure monitoring. Snmp collect
 
 Copyright (c) 2011
 
-![ScreenShot](https://raw.github.com/minkolazer/netmon/master/1-netmon_index.png)
+![ScreenShot](https://raw.github.com/mink0/netmon/master/1-netmon_index.png)
 
-![ScreenShot](https://raw.github.com/minkolazer/netmon/master/2-netmon_if_week.png)
+![ScreenShot](https://raw.github.com/mink0/netmon/master/2-netmon_if_week.png)
 
-![ScreenShot](https://raw.github.com/minkolazer/netmon/master/3-netmon_if_day.png)
+![ScreenShot](https://raw.github.com/mink0/netmon/master/3-netmon_if_day.png)
 
-![ScreenShot](https://raw.github.com/minkolazer/netmon/master/5-netmon_macs.png)
+![ScreenShot](https://raw.github.com/mink0/netmon/master/5-netmon_macs.png)
 
 
